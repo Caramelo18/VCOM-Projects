@@ -19,8 +19,6 @@ def process_image(path):
     #extrapolate the hand to fill dark spots within
     mask = cv2.dilate(mask,kernel,iterations = 3)
 
-    #blur the image
-    mask = cv2.GaussianBlur(mask,(3,3),500)
     cv2.imshow("Mask", mask)
 
     #find contours
