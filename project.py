@@ -3,9 +3,7 @@ import sys
 import numpy as np
 import math
 
-def process_image(path):
-    img = cv2.imread(path, 1)
-
+def process_image(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     kernel = np.ones((1,1),np.uint8)
     cv2.imshow("HSV", hsv)
@@ -103,14 +101,40 @@ def process_image(path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def main(argv):
-    if len(argv) is not 1:
-        print("usage")
-        sys.exit(1)
 
-    file = argv[0]
-    path = "samples/" + file
-    process_image(path)
+def capture_image():
+    cap = cv2.VideoCapture(0)
+
+    cv2.namedWindow('frame')
+    cv2.resizeWindow('frame', 634, 357)
+
+    while(True):
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+
+        frame = cv2.resize(frame, (634, 357), cv2.INTER_AREA)
+
+        # Display the resulting frame
+        cv2.imshow('frame',frame)
+
+        key = cv2.waitKey(1)
+        if key & 0xFF == ord('q'):
+            break
+        elif key & 0xFF == ord('d'):
+            process_image(frame)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+def main(argv):
+    if len(argv) is 0:
+        capture_image()
+    elif len(argv) is 1:
+        file = argv[0]
+        path = "samples/" + file
+
+        img = cv2.imread(path, 1)
+        process_image(img)
 
 
 if __name__ == '__main__':
