@@ -5,18 +5,18 @@ import math
 
 def process_image(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    kernel = np.ones((1,1),np.uint8)
+    kernel = np.ones((2,1),np.uint8)
     cv2.imshow("HSV", hsv)
+
     # define range of skin color in HSV
-    lower_skin = np.array([0,20,50], dtype=np.uint8)
-    upper_skin = np.array([50,255,255], dtype=np.uint8)
+    lower_skin = np.array([1,20,50], dtype=np.uint8)
+    upper_skin = np.array([14,255,255], dtype=np.uint8)
 
     #extract skin colur imagw
     mask = cv2.inRange(hsv, lower_skin, upper_skin)
 
     #extrapolate the hand to fill dark spots within
-    mask = cv2.dilate(mask,kernel,iterations = 3)
-
+    mask = cv2.dilate(mask,kernel,iterations = 10)
     cv2.imshow("Mask", mask)
 
     #find contours
@@ -46,13 +46,15 @@ def process_image(img):
     # l = no. of defects
     l=0
 
+    max_d = 0
+    height, _, _ = img.shape
+
     #code for finding no. of defects due to fingers
     for i in range(defects.shape[0]):
         s,e,f,d = defects[i,0]
         start = tuple(approx[s][0])
         end = tuple(approx[e][0])
         far = tuple(approx[f][0])
-        pt= (100,180)
 
 
         # find length of all sides of triangle
@@ -68,34 +70,34 @@ def process_image(img):
         # apply cosine rule here
         angle = math.acos((b**2 + c**2 - a**2)/(2*b*c)) * 57
 
+        #print(angle, d)
 
         # ignore angles > 90 and ignore points very close to convex hull(they generally come due to noise)
-        if angle <= 90 and d>30:
+
+        ratio = height / d
+        if angle <= 90 and ratio < 8:
             l += 1
-            cv2.circle(img, far, 3, [255,0,0], -1)
+            cv2.circle(img, far, 5, [255,0,0], -1)
+
+        if d > max_d:
+            max_d = d
 
         #draw lines around hand
-        cv2.line(img,start, end, [0,255,0], 2)
+        cv2.line(img,start, far, [0,255,0], 2)
+        cv2.line(img,far, end, [0,255,0], 2)
 
 
-    l+=1
+        cv2.circle(img, far, 2, [0,0,255], -1)
 
+    ratio = height / max_d
+    if ratio < 10:
+        l += 1
 
-    if l==1:
-        print(0)
-    elif l==2:
-        print(1)
-    elif l==3:
-        print(2)
-    elif l==4:
-        print(3)
-    elif l==5:
-        print(4)
-    elif l==6:
-        print(5)
+    print(l)
 
+    cv2.imshow('Mask',mask)
 
-    cv2.imshow('Hand',mask)
+    cv2.imshow('Hand Mask', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
