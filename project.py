@@ -3,9 +3,23 @@ import sys
 import numpy as np
 import math
 
+def apply_clahe(img):
+    b, g, r = cv2.split(img)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    b = clahe.apply(b)
+    g = clahe.apply(g)
+    r = clahe.apply(r)
+    img = cv2.merge((b, g, r))
+    return img
+
 def process_image(img):
+    cv2.imshow("before", img)
+    img = apply_clahe(img)
+    cv2.imshow("after", img)
+    cv2.waitKey(0)
+    return
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    kernel = np.ones((2,1),np.uint8)
+    kernel = np.ones((2,1), np.uint8)
     cv2.imshow("HSV", hsv)
 
     # define range of skin color in HSV
