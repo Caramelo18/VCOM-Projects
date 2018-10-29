@@ -3,34 +3,28 @@ import sys
 import numpy as np
 import math
 
-def apply_clahe(img):
-    b, g, r = cv2.split(img)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-    b = clahe.apply(b)
-    g = clahe.apply(g)
-    r = clahe.apply(r)
-    img = cv2.merge((b, g, r))
-    return img
+
+def blur(img):
+    blured = cv2.bilateralFilter(img,d=9,sigmaColor=100,sigmaSpace=100)
+    return blured
 
 def process_image(img):
-    cv2.imshow("before", img)
-    img = apply_clahe(img)
-    cv2.imshow("after", img)
+    img = blur(img)
     cv2.waitKey(0)
-    return
+
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     kernel = np.ones((2,1), np.uint8)
     cv2.imshow("HSV", hsv)
 
     # define range of skin color in HSV
-    lower_skin = np.array([1,20,50], dtype=np.uint8)
-    upper_skin = np.array([14,255,255], dtype=np.uint8)
+    lower_skin = np.array([1,45,80], dtype=np.uint8)
+    upper_skin = np.array([15,255,255], dtype=np.uint8)
 
     #extract skin colur imagw
     mask = cv2.inRange(hsv, lower_skin, upper_skin)
 
     #extrapolate the hand to fill dark spots within
-    mask = cv2.dilate(mask,kernel,iterations = 10)
+    mask = cv2.dilate(mask,kernel,iterations = 8)
     cv2.imshow("Mask", mask)
 
     #find contours
@@ -107,7 +101,7 @@ def process_image(img):
     if ratio < 10:
         l += 1
 
-    print(l)
+    print("Number of fingers: ", l)
 
     cv2.imshow('Mask',mask)
 
