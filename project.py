@@ -10,10 +10,9 @@ def blur(img):
 
 def process_image(img):
     img = blur(img)
-    cv2.waitKey(0)
 
+    height, _, _ = img.shape
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    kernel = np.ones((2,1), np.uint8)
     cv2.imshow("HSV", hsv)
 
     # define range of skin color in HSV
@@ -24,7 +23,10 @@ def process_image(img):
     mask = cv2.inRange(hsv, lower_skin, upper_skin)
 
     #extrapolate the hand to fill dark spots within
-    mask = cv2.dilate(mask,kernel,iterations = 8)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 3)
+    mask = cv2.dilate(mask,kernel,iterations = 2)
+
     cv2.imshow("Mask", mask)
 
     #find contours
@@ -55,7 +57,6 @@ def process_image(img):
     l=0
 
     max_d = 0
-    height, _, _ = img.shape
 
     #code for finding no. of defects due to fingers
     for i in range(defects.shape[0]):
