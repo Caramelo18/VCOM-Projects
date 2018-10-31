@@ -16,7 +16,7 @@ def process_image(img):
     cv2.imshow("HSV", hsv)
 
     # define range of skin color in HSV
-    lower_skin = np.array([1,45,80], dtype=np.uint8)
+    lower_skin = np.array([1,45,0], dtype=np.uint8)
     upper_skin = np.array([15,255,255], dtype=np.uint8)
 
     #extract skin colur imagw
