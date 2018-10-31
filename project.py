@@ -17,7 +17,7 @@ def process_image(img):
 
     # define range of skin color in HSV
     lower_skin = np.array([1,45,0], dtype=np.uint8)
-    upper_skin = np.array([15,255,255], dtype=np.uint8)
+    upper_skin = np.array([15,200,255], dtype=np.uint8)
 
     #extract skin colur imagw
     mask = cv2.inRange(hsv, lower_skin, upper_skin)
