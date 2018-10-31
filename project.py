@@ -25,29 +25,22 @@ def process_image(img):
     #extrapolate the hand to fill dark spots within
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 3)
-    mask = cv2.dilate(mask,kernel,iterations = 2)
+    mask = cv2.dilate(mask, kernel, iterations = 2)
 
     cv2.imshow("Mask", mask)
 
     #find contours
-    _,contours,hierarchy= cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     #find contour of max area(hand)
     cnt = max(contours, key = lambda x: cv2.contourArea(x))
 
     #approx the contour a little
-    epsilon = 0.0005*cv2.arcLength(cnt,True)
-    approx= cv2.approxPolyDP(cnt,epsilon,True)
+    epsilon = 0.0005*cv2.arcLength(cnt, True)
+    approx = cv2.approxPolyDP(cnt, epsilon, True)
 
     #make convex hull around hand
     hull = cv2.convexHull(cnt)
-
-    #define area of hull and area of hand
-    areahull = cv2.contourArea(hull)
-    areacnt = cv2.contourArea(cnt)
-
-    #find the percentage of area not covered by hand in convex hull
-    arearatio=((areahull-areacnt)/areacnt)*100
 
     #find the defects in convex hull with respect to hand
     hull = cv2.convexHull(approx, returnPoints=False)
@@ -104,7 +97,7 @@ def process_image(img):
 
     print("Number of fingers: ", l)
 
-    cv2.imshow('Mask',mask)
+    cv2.imshow('Mask', mask)
 
     cv2.imshow('Hand Mask', img)
     cv2.waitKey(0)
