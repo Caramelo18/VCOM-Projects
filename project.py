@@ -4,35 +4,42 @@ import numpy as np
 import math
 
 
-def blur(img):
-    blured = cv2.bilateralFilter(img,d=9,sigmaColor=100,sigmaSpace=100)
+def preprocessing(img):
+    blured = cv2.bilateralFilter(img, d=9, sigmaColor=100, sigmaSpace=100)
     return blured
 
-def process_image(img):
-    img = blur(img)
-
-    height, _, _ = img.shape
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    cv2.imshow("HSV", hsv)
-
+def skin_color_segmentation(hsv):
     # define range of skin color in HSV
     lower_skin = np.array([1,45,0], dtype=np.uint8)
     upper_skin = np.array([15,200,255], dtype=np.uint8)
 
-    #extract skin colur imagw
+    # extract skin color mask
     mask = cv2.inRange(hsv, lower_skin, upper_skin)
 
-    #extrapolate the hand to fill dark spots within
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 3)
-    mask = cv2.dilate(mask, kernel, iterations = 2)
+    return mask
 
+def apply_morph_operations(img):
+    # extrapolate the hand to fill dark spots within
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations = 3)
+    img = cv2.dilate(img, kernel, iterations = 2)
+    return img
+
+def process_image(img):
+    img = preprocessing(img)
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    cv2.imshow("HSV", hsv)
+
+    mask = skin_color_segmentation(hsv)
+
+    mask = apply_morph_operations(mask)
     cv2.imshow("Mask", mask)
 
-    #find contours
+    # find contours
     _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    #find contour of max area(hand)
+    # find contour of max area(hand)
     cnt = max(contours, key = lambda x: cv2.contourArea(x))
 
     #approx the contour a little
@@ -47,9 +54,11 @@ def process_image(img):
     defects = cv2.convexityDefects(approx, hull)
 
     # l = no. of defects
-    l=0
+    l = 0
 
     max_d = 0
+
+    height, _, _ = img.shape
 
     #code for finding no. of defects due to fingers
     for i in range(defects.shape[0]):
