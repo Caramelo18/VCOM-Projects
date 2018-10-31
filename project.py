@@ -32,6 +32,18 @@ def find_hand_contour(img):
 
     return cnt
 
+def find_convexity_defects(contour):
+    # find defects in convex hull of hand
+    hull = cv2.convexHull(contour, returnPoints=False)
+    defects = cv2.convexityDefects(contour, hull)
+    return defects
+
+def get_triangle_area(a, b, c):
+    # Given the length of each side of the triangle, returns its area using Heron's formula
+    perimeter = (a+b+c)/2
+    return math.sqrt(perimeter * (perimeter - a) * (perimeter - b) * (perimeter - c))
+
+
 def process_image(img):
     img = preprocessing(img)
 
@@ -43,63 +55,55 @@ def process_image(img):
     cv2.imshow("Mask", mask)
 
     cnt = find_hand_contour(mask)
-    
-    # find defects in convex hull of hand
-    hull = cv2.convexHull(cnt, returnPoints=False)
-    defects = cv2.convexityDefects(cnt, hull)
 
-    # l = no. of defects
-    l = 0
+    defects = find_convexity_defects(cnt)
 
-    max_d = 0
+    finger_defects_count = 0
+
+    max_defect_length = 0
 
     height, _, _ = img.shape
 
-    #code for finding no. of defects due to fingers
     for i in range(defects.shape[0]):
-        s,e,f,d = defects[i,0]
+        s, e, f, d = defects[i, 0]
         start = tuple(cnt[s][0])
         end = tuple(cnt[e][0])
         far = tuple(cnt[f][0])
 
-
-        # find length of all sides of triangle
+        # find length of all sides of the defect triangle
         a = math.sqrt((end[0] - start[0])**2 + (end[1] - start[1])**2)
         b = math.sqrt((far[0] - start[0])**2 + (far[1] - start[1])**2)
         c = math.sqrt((end[0] - far[0])**2 + (end[1] - far[1])**2)
-        s = (a+b+c)/2
-        ar = math.sqrt(s*(s-a)*(s-b)*(s-c))
+        area = get_triangle_area(a, b, c)
 
-        #distance between point and convex hull
-        d=(2*ar)/a
+        # distance between defect point and convex hull (height of the defect triangle)
+        defect_length = (2 * area) / a
 
-        # apply cosine rule here
-        angle = math.acos((b**2 + c**2 - a**2)/(2*b*c)) * 57
+        # find the angle of the defect triangle
+        angle = math.degrees(math.acos((b**2 + c**2 - a**2 )/ (2 * b * c)))
 
-        #print(angle, d)
-
-        # ignore angles > 90 and ignore points very close to convex hull(they generally come due to noise)
-
-        ratio = height / d
+        # ignore angles > 90 and ignore points very close to convex hull (they generally correspond to noise or imperfections in the mask)
+        ratio = height / defect_length
         if angle <= 90 and ratio < 8:
-            l += 1
-            cv2.circle(img, far, 5, [255,0,0], -1)
+            finger_defects_count += 1
+            cv2.circle(img, far, 5, [255, 0, 0], -1)
 
-        if d > max_d:
-            max_d = d
+        if defect_length > max_defect_length:
+            max_defect_length = defect_length
 
-        #draw lines around hand
+        # draw lines around hand
         cv2.line(img,start, far, [0,255,0], 2)
         cv2.line(img,far, end, [0,255,0], 2)
 
-
+        # draw defect point
         cv2.circle(img, far, 2, [0,0,255], -1)
 
-    ratio = height / max_d
+    # find if longest defect is big enough to be considered a finger
+    ratio = height / max_defect_length
     if ratio < 10:
-        l += 1
+        finger_defects_count += 1
 
-    print("Number of fingers: ", l)
+    print("Number of fingers: ", finger_defects_count)
 
     cv2.imshow('Mask', mask)
 
