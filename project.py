@@ -5,8 +5,8 @@ import math
 
 
 def preprocessing(img):
-    blured = cv2.bilateralFilter(img, d=9, sigmaColor=100, sigmaSpace=100)
-    return blured
+    blurred = cv2.bilateralFilter(img, d=9, sigmaColor=100, sigmaSpace=100)
+    return blurred
 
 def skin_color_segmentation(hsv):
     # define range of skin color in HSV
@@ -19,39 +19,34 @@ def skin_color_segmentation(hsv):
     return mask
 
 def apply_morph_operations(img):
-    # extrapolate the hand to fill dark spots within
+    # extrapolate the hand to fill dark spots within it
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations = 3)
     img = cv2.dilate(img, kernel, iterations = 2)
     return img
 
+def find_hand_contour(img):
+    _, contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # select only contour of object with max area
+    cnt = max(contours, key = lambda x: cv2.contourArea(x))
+
+    return cnt
+
 def process_image(img):
     img = preprocessing(img)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    cv2.imshow("HSV", hsv)
 
     mask = skin_color_segmentation(hsv)
 
     mask = apply_morph_operations(mask)
     cv2.imshow("Mask", mask)
 
-    # find contours
-    _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    # find contour of max area(hand)
-    cnt = max(contours, key = lambda x: cv2.contourArea(x))
-
-    #approx the contour a little
-    epsilon = 0.0005*cv2.arcLength(cnt, True)
-    approx = cv2.approxPolyDP(cnt, epsilon, True)
-
-    #make convex hull around hand
-    hull = cv2.convexHull(cnt)
-
-    #find the defects in convex hull with respect to hand
-    hull = cv2.convexHull(approx, returnPoints=False)
-    defects = cv2.convexityDefects(approx, hull)
+    cnt = find_hand_contour(mask)
+    
+    # find defects in convex hull of hand
+    hull = cv2.convexHull(cnt, returnPoints=False)
+    defects = cv2.convexityDefects(cnt, hull)
 
     # l = no. of defects
     l = 0
@@ -63,9 +58,9 @@ def process_image(img):
     #code for finding no. of defects due to fingers
     for i in range(defects.shape[0]):
         s,e,f,d = defects[i,0]
-        start = tuple(approx[s][0])
-        end = tuple(approx[e][0])
-        far = tuple(approx[f][0])
+        start = tuple(cnt[s][0])
+        end = tuple(cnt[e][0])
+        far = tuple(cnt[f][0])
 
 
         # find length of all sides of triangle
