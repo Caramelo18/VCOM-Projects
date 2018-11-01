@@ -44,9 +44,13 @@ def get_triangle_area(a, b, c):
     perimeter = (a+b+c)/2
     return math.sqrt(perimeter * (perimeter - a) * (perimeter - b) * (perimeter - c))
 
-def cnt_size(img, cnt):
-    _,_,w,h = cv2.boundingRect(cnt)
+def cnt_size(cnt):
+    _, _, w, h = cv2.boundingRect(cnt)
     return max(w, h)
+
+def get_bounding_rectangle_area(cnt):
+    _, _, w, h = cv2.boundingRect(cnt)
+    return w * h
 
 def process_image(img):
     img = preprocessing(img)
@@ -59,15 +63,10 @@ def process_image(img):
     cv2.imshow("Mask", mask)
 
     cnt = find_hand_contour(mask)
-
     defects = find_convexity_defects(cnt)
-
-    max_length = cnt_size(img, cnt)
+    max_length = cnt_size(cnt)
 
     finger_defects_count = 0
-
-    max_defect_length = 0
-
 
     for i in range(defects.shape[0]):
         s, e, f, d = defects[i, 0]
@@ -88,13 +87,10 @@ def process_image(img):
         angle = math.degrees(math.acos((b**2 + c**2 - a**2 )/ (2 * b * c)))
 
         # ignore angles > 90 and ignore points very close to convex hull (they generally correspond to noise or imperfections in the mask)
-        ratio = max_length / defect_length
-        if angle <= 87 and ratio < 8:
+        ratio = defect_length / max_length
+        if angle <= 90 and ratio > 0.15:
             finger_defects_count += 1
             cv2.circle(img, far, 5, [255, 0, 0], -1)
-
-        if defect_length > max_defect_length:
-            max_defect_length = defect_length
 
         # draw lines around hand
         cv2.line(img,start, far, [0,255,0], 2)
@@ -103,18 +99,27 @@ def process_image(img):
         # draw defect point
         cv2.circle(img, far, 2, [0,0,255], -1)
 
-    # find if longest defect is big enough to be considered a finger
-    ratio = max_length / max_defect_length
-    if ratio < 9:
-        finger_defects_count += 1
+    if finger_defects_count == 0:
+        cnt_area = cv2.contourArea(cnt)
+        bounding_rectangle_area = get_bounding_rectangle_area(cnt)
+        area_ratio = cnt_area / bounding_rectangle_area
 
-    print("Number of fingers: ", finger_defects_count)
+        if area_ratio > 0.7:
+            finger_count = 0
+        else:
+            finger_count = 1
+    else:
+        finger_count = finger_defects_count + 1
+
+    #print("Number of fingers: ", finger_count)
 
     cv2.imshow('Mask', mask)
 
     cv2.imshow('Hand Mask', img)
-    cv2.waitKey(0)
+    #cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    return finger_count
 
 
 def capture_image():
@@ -141,16 +146,57 @@ def capture_image():
     cap.release()
     cv2.destroyAllWindows()
 
+def run_tests():
+    tests = {
+        '0_0.jpg': 0,
+        '0.jpg': 0,
+        '1_lado.jpg': 1,
+        '1.jpg': 1,
+        '2.jpg': 2,
+        '2far.jpg': 2,
+        '2far1.jpg': 2,
+        '2upside.jpg': 2,
+        '3.jpg': 3,
+        '3far.jpg': 3,
+        '3side.jpg': 3,
+        '31.jpg': 3,
+        '4.jpg': 4,
+        '4side.jpg': 4,
+        '5.jpg': 5,
+        '5side.jpg': 5,
+        'diogo1.jpg': 1,
+        'diogo3.jpg': 3,
+        'diogo4.jpg': 4,
+        'diogo42.jpg': 4,
+        'fabio5.jpg': 5,
+        'img1.png': 1,
+        'img2.png': 2,
+        'img3.png': 3,
+        'img4.png': 4,
+        'img5.png': 5
+    }
+
+    for test in tests:
+        path = "samples/" + test
+        img = cv2.imread(path, 1)
+        result = process_image(img)
+        if result == tests[test]:
+            print('{}: OK'.format(test))
+        else:
+            print('{}: Expected {} but received {}.'.format(test, tests[test], result))
+
 def main(argv):
     if len(argv) is 0:
         capture_image()
     elif len(argv) is 1:
-        file = argv[0]
-        path = "samples/" + file
-
-        img = cv2.imread(path, 1)
-        process_image(img)
-
+        if argv[0] == 'tests':
+            run_tests()
+        else:
+            file = argv[0]
+            path = "samples/" + file
+            img = cv2.imread(path, 1)
+            process_image(img)
+    
 
 if __name__ == '__main__':
     main(sys.argv[1:])
