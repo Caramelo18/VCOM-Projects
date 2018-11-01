@@ -103,8 +103,7 @@ def process_image(img):
         cnt_area = cv2.contourArea(cnt)
         bounding_rectangle_area = get_bounding_rectangle_area(cnt)
         area_ratio = cnt_area / bounding_rectangle_area
-
-        if area_ratio > 0.7:
+        if area_ratio > 0.65:
             finger_count = 0
         else:
             finger_count = 1
@@ -150,11 +149,15 @@ def run_tests():
     tests = {
         '0_0.jpg': 0,
         '0.jpg': 0,
+        '0dark.jpg': 0,
+        '0fake.jpg': 0,
         '1_lado.jpg': 1,
         '1.jpg': 1,
         '2.jpg': 2,
         '2far.jpg': 2,
         '2far1.jpg': 2,
+        '2dark.jpg': 2,
+        '2fake.png': 2,
         '2upside.jpg': 2,
         '3.jpg': 3,
         '3far.jpg': 3,
@@ -162,6 +165,7 @@ def run_tests():
         '31.jpg': 3,
         '4.jpg': 4,
         '4side.jpg': 4,
+        '4diagonal.jpg': 4,
         '5.jpg': 5,
         '5side.jpg': 5,
         'diogo1.jpg': 1,
