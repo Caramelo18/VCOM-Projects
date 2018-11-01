@@ -39,35 +39,8 @@ def find_convexity_defects(contour):
     defects = cv2.convexityDefects(contour, hull)
     return defects
 
-def get_triangle_area(a, b, c):
-    # Given the length of each side of the triangle, returns its area using Heron's formula
-    perimeter = (a+b+c)/2
-    return math.sqrt(perimeter * (perimeter - a) * (perimeter - b) * (perimeter - c))
-
-def cnt_size(cnt):
-    _, _, w, h = cv2.boundingRect(cnt)
-    return max(w, h)
-
-def get_bounding_rectangle_area(cnt):
-    _, _, w, h = cv2.boundingRect(cnt)
-    return w * h
-
-def process_image(img):
-    img = preprocessing(img)
-
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-    mask = skin_color_segmentation(hsv)
-
-    mask = apply_morph_operations(mask)
-    cv2.imshow("Mask", mask)
-
-    cnt = find_hand_contour(mask)
-    defects = find_convexity_defects(cnt)
-    max_length = cnt_size(cnt)
-
+def count_finger_defects(defects, max_length, cnt, img):
     finger_defects_count = 0
-
     for i in range(defects.shape[0]):
         s, e, f, d = defects[i, 0]
         start = tuple(cnt[s][0])
@@ -93,12 +66,44 @@ def process_image(img):
             cv2.circle(img, far, 5, [255, 0, 0], -1)
 
         # draw lines around hand
-        cv2.line(img,start, far, [0,255,0], 2)
-        cv2.line(img,far, end, [0,255,0], 2)
+        cv2.line(img, start, far, [0,255,0], 2)
+        cv2.line(img, far, end, [0,255,0], 2)
 
         # draw defect point
         cv2.circle(img, far, 2, [0,0,255], -1)
 
+    return finger_defects_count
+
+
+def get_triangle_area(a, b, c):
+    # Given the length of each side of the triangle, returns its area using Heron's formula
+    perimeter = (a+b+c)/2
+    return math.sqrt(perimeter * (perimeter - a) * (perimeter - b) * (perimeter - c))
+
+def cnt_size(cnt):
+    _, _, w, h = cv2.boundingRect(cnt)
+    return max(w, h)
+
+def get_bounding_rectangle_area(cnt):
+    _, _, w, h = cv2.boundingRect(cnt)
+    return w * h
+
+def process_image(img, show_flag=False):
+    img = preprocessing(img)
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    mask = skin_color_segmentation(hsv)
+
+    mask = apply_morph_operations(mask)
+
+    cnt = find_hand_contour(mask)
+    defects = find_convexity_defects(cnt)
+    max_length = cnt_size(cnt)
+
+    finger_defects_count = count_finger_defects(defects, max_length, cnt, img)
+
+    # if no finger defects are found, checks if contour area is > 65% of bounding rectangle area, as that indicates a closed hand
     if finger_defects_count == 0:
         cnt_area = cv2.contourArea(cnt)
         bounding_rectangle_area = get_bounding_rectangle_area(cnt)
@@ -110,13 +115,12 @@ def process_image(img):
     else:
         finger_count = finger_defects_count + 1
 
-    #print("Number of fingers: ", finger_count)
-
-    cv2.imshow('Mask', mask)
-
-    cv2.imshow('Hand Mask', img)
-    #cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    if show_flag:
+        print("Number of fingers: ", finger_count)
+        cv2.imshow('Mask', mask)
+        cv2.imshow('Hand', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return finger_count
 
@@ -140,7 +144,7 @@ def capture_image():
         if key & 0xFF == ord('q'):
             break
         elif key & 0xFF == ord('d'):
-            process_image(frame)
+            process_image(frame, show_flag=True)
 
     cap.release()
     cv2.destroyAllWindows()
@@ -149,10 +153,13 @@ def run_tests():
     tests = {
         '0_0.jpg': 0,
         '0.jpg': 0,
+        '0cama.jpg': 0,
         '0dark.jpg': 0,
         '0fake.jpg': 0,
         '1_lado.jpg': 1,
         '1.jpg': 1,
+        '1cama.jpg': 1,
+        '1background.jpg': 1,
         '2.jpg': 2,
         '2far.jpg': 2,
         '2far1.jpg': 2,
@@ -199,7 +206,7 @@ def main(argv):
             file = argv[0]
             path = "samples/" + file
             img = cv2.imread(path, 1)
-            process_image(img)
+            process_image(img, show_flag=True)
     
 
 if __name__ == '__main__':
