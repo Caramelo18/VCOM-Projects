@@ -23,6 +23,7 @@ def apply_morph_operations(img):
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations = 3)
     img = cv2.dilate(img, kernel, iterations = 2)
+    #img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations = 8)
     return img
 
 def find_hand_contour(img):
@@ -43,6 +44,9 @@ def get_triangle_area(a, b, c):
     perimeter = (a+b+c)/2
     return math.sqrt(perimeter * (perimeter - a) * (perimeter - b) * (perimeter - c))
 
+def cnt_size(img, cnt):
+    _,_,w,h = cv2.boundingRect(cnt)
+    return max(w, h)
 
 def process_image(img):
     img = preprocessing(img)
@@ -58,11 +62,12 @@ def process_image(img):
 
     defects = find_convexity_defects(cnt)
 
+    max_length = cnt_size(img, cnt)
+
     finger_defects_count = 0
 
     max_defect_length = 0
 
-    height, _, _ = img.shape
 
     for i in range(defects.shape[0]):
         s, e, f, d = defects[i, 0]
@@ -83,8 +88,8 @@ def process_image(img):
         angle = math.degrees(math.acos((b**2 + c**2 - a**2 )/ (2 * b * c)))
 
         # ignore angles > 90 and ignore points very close to convex hull (they generally correspond to noise or imperfections in the mask)
-        ratio = height / defect_length
-        if angle <= 90 and ratio < 8:
+        ratio = max_length / defect_length
+        if angle <= 87 and ratio < 8:
             finger_defects_count += 1
             cv2.circle(img, far, 5, [255, 0, 0], -1)
 
@@ -99,8 +104,8 @@ def process_image(img):
         cv2.circle(img, far, 2, [0,0,255], -1)
 
     # find if longest defect is big enough to be considered a finger
-    ratio = height / max_defect_length
-    if ratio < 10:
+    ratio = max_length / max_defect_length
+    if ratio < 9:
         finger_defects_count += 1
 
     print("Number of fingers: ", finger_defects_count)
