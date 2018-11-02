@@ -168,6 +168,7 @@ def run_tests():
         '2upside.jpg': 2,
         '3.jpg': 3,
         '3far.jpg': 3,
+        '3obs.jpg': 3,
         '3side.jpg': 3,
         '31.jpg': 3,
         '4.jpg': 4,
@@ -207,7 +208,7 @@ def main(argv):
             path = "samples/" + file
             img = cv2.imread(path, 1)
             process_image(img, show_flag=True)
-    
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])
