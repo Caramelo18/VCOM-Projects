@@ -19,6 +19,10 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
+import argparse
+
+from google.colab import drive 
+drive.mount('/content/drive/')
 
 
 image_size = 299
@@ -32,20 +36,19 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
-        'data/train/',
+        '/content/drive/My Drive/VCOM/data/train/',
         target_size=(image_size, image_size),
         batch_size=32,
         class_mode='categorical')
 
 
 validation_generator = test_datagen.flow_from_directory(
-        'data/validation/',
+        '/content/drive/My Drive/VCOM/data/validation/',
         target_size=(image_size, image_size),
         batch_size=32,
         class_mode='categorical')
 
-
-def main(): 
+def main():
     parser = ArgumentParser()
     parser.add_argument("-c", "--classify", type=classify, action="store", help="classify an image on the test folder")
     parser.add_argument("-tc", "--train_classification", action="store_true")
@@ -55,9 +58,9 @@ def main():
         train_classification()
 
 def classify(file):
-    model = load_model('128d-1-100-5-120.h5')
+    model = load_model('/content/drive/My Drive/VCOM/128d-1-100-5-120.h5')
 
-    path = 'data/test/test_images/' + file
+    path = '/content/drive/My Drive/VCOM/data/test/test_images/' + file
     
     img = image.load_img(path, target_size=(image_size, image_size))
     img = image.img_to_array(img)
@@ -75,6 +78,7 @@ def classify(file):
     #print(labels)
     predictions = [labels[k] for k in predicted_class_indices]
     print(predictions)
+
 
 def train_classification():
     base_model = InceptionV3(weights='imagenet', include_top=False, input_shape=(image_size, image_size, 3))
@@ -100,6 +104,7 @@ def train_classification():
             validation_steps=50,
             verbose = 1)
 
+
     for layer in model.layers[:249]:
        layer.trainable = False
     for layer in model.layers[249:]:
@@ -109,13 +114,13 @@ def train_classification():
 
     model.fit_generator(
             train_generator,
-            steps_per_epoch=150,
-            epochs=3,
+            steps_per_epoch=120,
+            epochs=5,
             validation_data=validation_generator,
             validation_steps=75,
             verbose = 1)
     
-    model.save('my_model.h5')  # creates a HDF5 file 'my_model.h5'
+    model.save('/content/drive/My Drive/VCOM/my_model.h5')  # creates a HDF5 file 'my_model.h5'
 
 
 if __name__=='__main__':
