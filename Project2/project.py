@@ -14,12 +14,16 @@ from keras import models
 from keras import layers
 from keras import backend as K
 from argparse import ArgumentParser
+from numpy.random import seed
+from tensorflow import set_random_seed
 import random
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import pandas as pd
 
+seed(1143)
+set_random_seed(1143)
 
 image_size = 299
 
