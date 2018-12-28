@@ -4,8 +4,8 @@ from PIL import Image
 
 def main():
     yolo = YOLO()
-    
-    image = Image.open('../data/train/camara/camara-0005.jpg')
+
+    image = Image.open('../data/images/camara/camara-0005.jpg')
 
     r_image = yolo.detect_image(image)
     r_image.show()

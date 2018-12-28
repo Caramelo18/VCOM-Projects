@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 
-from google.colab import drive 
+from google.colab import drive
 drive.mount('/content/drive/')
 
 seed(1143)
@@ -35,7 +35,11 @@ train_datagen = ImageDataGenerator(
         rescale=1./255,
         shear_range=0.2,
         zoom_range=0.2,
-        horizontal_flip=True)
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        rotation_range=30,
+        horizontal_flip=True,
+        fill_mode='nearest')
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
@@ -65,7 +69,7 @@ def classify(file):
     model = load_model('/content/drive/My Drive/VCOM/128d-1-100-5-120.h5')
 
     path = '/content/drive/My Drive/VCOM/data/test/test_images/' + file
-    
+
     img = image.load_img(path, target_size=(image_size, image_size))
     img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0)
@@ -73,7 +77,7 @@ def classify(file):
 
     pred = model.predict(img)
     print(pred)
-    
+
     predicted_class_indices = np.argmax(pred,axis=1)
     #print(predicted_class_indices)
 
@@ -102,12 +106,11 @@ def train_classification():
 
     model.fit_generator(
             train_generator,
-            steps_per_epoch=100,
-            epochs=1,
+            steps_per_epoch=75,
+            epochs=2,
             validation_data=validation_generator,
             validation_steps=50,
             verbose = 1)
-
 
     for layer in model.layers[:249]:
        layer.trainable = False
@@ -118,12 +121,12 @@ def train_classification():
 
     model.fit_generator(
             train_generator,
-            steps_per_epoch=120,
-            epochs=5,
+            steps_per_epoch=75,
+            epochs=4,
             validation_data=validation_generator,
             validation_steps=75,
             verbose = 1)
-    
+
     model.save('/content/drive/My Drive/VCOM/my_model.h5')  # creates a HDF5 file 'my_model.h5'
 
 
