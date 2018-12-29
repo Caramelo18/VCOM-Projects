@@ -2,7 +2,8 @@ import os, random, shutil
 import xml.etree.ElementTree as ET
 
 classes = {'arrabida': 0, 'camara': 1, 'clerigos': 2, 'musica': 3, 'serralves': 4}
-
+f =  f = open("annotations.txt", "a")
+basepath = '/content/drive/My Drive/VCOM/images/'
 
 def main():
     for dirname, dirnames, filenames in os.walk('./data/annotations'):
@@ -17,11 +18,13 @@ def read_file(path):
     tree = ET.parse(path)
     root = tree.getroot()
 
-    imgpath = root.find('path').text
+    img_name = root.find('filename').text
 
     obj = root.find('object')
     obj_name = obj.find('name').text
     obj_id = classes[obj_name]
+
+    img_path = basepath + obj_name + "/" + img_name
 
     bnd_box = obj.find('bndbox')
     x_min = int(float(bnd_box.find('xmin').text))
@@ -29,7 +32,8 @@ def read_file(path):
     x_max = int(float(bnd_box.find('xmax').text))
     y_max = int(float(bnd_box.find('ymax').text))
 
-    str = '{} {},{},{},{},{}'.format(imgpath, x_min, y_min, x_max, y_max, obj_id)
+    str = '{} {},{},{},{},{}\n'.format(img_path, x_min, y_min, x_max, y_max, obj_id)
+    f.write(str)
 
     print(str)
 
@@ -49,16 +53,16 @@ def split_dataset():
             train_dir = './data/train/{}'.format(class_name)
             if not os.path.exists(train_dir):
                 os.makedirs(train_dir)
-                
+
             val_dir = './data/validation/{}'.format(class_name)
             if not os.path.exists(val_dir):
                 os.makedirs(val_dir)
-            
+
             for train_image in train_files:
                 src_path = class_path + '/' + train_image
                 dest_path = train_dir + '/' + train_image
                 shutil.copyfile(src_path, dest_path)
-            
+
             for val_image in val_files:
                 src_path = class_path + '/' + val_image
                 dest_path = val_dir + '/' + val_image
