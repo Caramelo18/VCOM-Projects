@@ -1,8 +1,9 @@
 import os, random, shutil
 import xml.etree.ElementTree as ET
 
+#classes = {'arrabida': 21, 'camara': 22, 'clerigos': 23, 'musica': 24, 'serralves': 25}
 classes = {'arrabida': 0, 'camara': 1, 'clerigos': 2, 'musica': 3, 'serralves': 4}
-f =  f = open("annotations.txt", "a")
+f =  f = open("annotations.txt", "w")
 basepath = '/content/drive/My Drive/VCOM/images/'
 
 def main():
