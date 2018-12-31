@@ -7,7 +7,7 @@ f =  f = open("annotations.txt", "w")
 basepath = '/content/drive/My Drive/VCOM/images/'
 
 def main():
-    for dirname, dirnames, filenames in os.walk('./data/annotations'):
+    for dirname, dirnames, filenames in os.walk('./data_annotations/train'):
         # print path to all filenames.
         for filename in filenames:
             path = os.path.join(dirname, filename)
@@ -68,6 +68,24 @@ def split_dataset():
                 src_path = class_path + '/' + val_image
                 dest_path = val_dir + '/' + val_image
                 shutil.copyfile(src_path, dest_path)
+
+
+def split_annotations():
+    for image_type in ['train', 'validation']:
+        for dirname, dirnames, filenames in os.walk('./data/{}'.format(image_type)):
+            for class_name in dirnames:
+                class_path = os.path.join(dirname, class_name)
+                class_path, class_dirs, class_files = next(os.walk(class_path))
+
+                class_dir = './data_annotations/{}/{}'.format(image_type, class_name)
+                if not os.path.exists(class_dir):
+                    os.makedirs(class_dir)
+
+                for image in class_files:
+                    image_name = image.split('.')[0]
+                    src_annotation_path = './annotations/{}/{}.xml'.format(class_name, image_name)
+                    dest_annotation_path = './data_annotations/{}/{}/{}.xml '.format(image_type, class_name, image_name)
+                    shutil.copyfile(src_annotation_path, dest_annotation_path)
 
 
 if __name__=='__main__':
