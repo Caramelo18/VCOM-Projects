@@ -190,7 +190,6 @@
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0244.jpg 171,9,598,481,1
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0324.jpg 240,1060,2740,3795,1
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0293.jpg 1515,1190,2135,2010,1
-/content/drive/My Drive/VCOM/data/validation/camara/camara-0248.jpg 5,535,2040,2790,1
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0426.jpg 750,100,3000,3535,1
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0260.jpg 330,690,2390,2930,1
 /content/drive/My Drive/VCOM/data/validation/camara/camara-0050.jpg 281,67,529,335,1
@@ -225,7 +224,7 @@
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0403.jpg 484,358,546,666,2
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0074.jpg 91,43,256,861,2
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0028.jpg 301,44,404,536,2
-/content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0135.jpg 58,8,122,316,2
+/content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0135.bmp 58,8,122,316,2
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0506.jpg 700,0,2105,3960,2
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0470.jpg 960,0,2455,2960,2
 /content/drive/My Drive/VCOM/data/validation/clerigos/clerigos-0453.jpg 1275,0,2925,2855,2
