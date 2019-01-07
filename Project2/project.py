@@ -27,6 +27,7 @@ seed(1143)
 set_random_seed(1143)
 
 image_size = 299
+min_confidence = 0.35
 
 train_datagen = ImageDataGenerator(
         rescale=1./255,
@@ -69,7 +70,7 @@ def main():
 
 
 def stats():
-    model = load_model('my_model.h5')
+    model = load_model('detection.h5')
 
     classes = ['arrabida', 'camara', 'clerigos', 'musica', 'serralves']
 
@@ -99,7 +100,7 @@ def stats():
 
                 predicted_class = predictions[0]
                 results[class_name][predicted_class] += 1
-    
+
     print(results)
 
 
@@ -111,9 +112,9 @@ def eval():
 
 
 def classify(file):
-    model = load_model('128d-1-100-5-120.h5')
+    model = load_model('detection.h5')
 
-    path = 'data/test/test_images/' + file
+    path = 'data/images/' + file
 
     img = image.load_img(path, target_size=(image_size, image_size))
     img = image.img_to_array(img)
@@ -129,8 +130,13 @@ def classify(file):
     labels = (train_generator.class_indices)
     labels = dict((v,k) for k,v in labels.items())
     #print(labels)
-    predictions = [labels[k] for k in predicted_class_indices]
-    print(predictions)
+    predictions = [labels[k] for k in predicted_class_indices][0]
+    confidence = [pred[0][k] for k in predicted_class_indices][0]
+
+    if confidence > min_confidence:
+        print(predictions, "-", confidence)
+        return
+    print("None")
 
 def train_classification():
     base_model = InceptionV3(weights='imagenet', include_top=False, input_shape=(image_size, image_size, 3))

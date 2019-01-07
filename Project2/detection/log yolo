@@ -1,4 +1,3 @@
-
 Load weights /content/drive/My Drive/VCOM/detection/model_data/yolo_weights.h5.
 Freeze the first 249 layers of total 252 layers.
 Train on 1662 samples, val on 418 samples, with batch size 32.
