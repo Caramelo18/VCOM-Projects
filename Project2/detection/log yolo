@@ -1,0 +1,77 @@
+
+Load weights /content/drive/My Drive/VCOM/detection/model_data/yolo_weights.h5.
+Freeze the first 249 layers of total 252 layers.
+Train on 1662 samples, val on 418 samples, with batch size 32.
+Epoch 1/20
+51/51 [==============================] - 796s 16s/step - loss: 2102.1712 - val_loss: 256.6558
+Epoch 2/20
+51/51 [==============================] - 333s 7s/step - loss: 183.3456 - val_loss: 127.6380
+Epoch 3/20
+51/51 [==============================] - 336s 7s/step - loss: 109.9774 - val_loss: 88.3931
+Epoch 4/20
+51/51 [==============================] - 317s 6s/step - loss: 80.6383 - val_loss: 69.1206
+Epoch 5/20
+51/51 [==============================] - 335s 7s/step - loss: 63.7004 - val_loss: 55.5882
+Epoch 6/20
+51/51 [==============================] - 340s 7s/step - loss: 53.1954 - val_loss: 48.4802
+Epoch 7/20
+51/51 [==============================] - 339s 7s/step - loss: 46.9223 - val_loss: 42.4859
+Epoch 8/20
+51/51 [==============================] - 332s 7s/step - loss: 41.5169 - val_loss: 38.3452
+Epoch 9/20
+51/51 [==============================] - 347s 7s/step - loss: 37.8115 - val_loss: 35.7104
+Epoch 10/20
+51/51 [==============================] - 340s 7s/step - loss: 34.6441 - val_loss: 33.1262
+Epoch 11/20
+51/51 [==============================] - 344s 7s/step - loss: 32.4763 - val_loss: 31.3112
+Epoch 12/20
+51/51 [==============================] - 338s 7s/step - loss: 30.6605 - val_loss: 29.3182
+Epoch 13/20
+51/51 [==============================] - 338s 7s/step - loss: 28.9726 - val_loss: 28.0836
+Epoch 14/20
+51/51 [==============================] - 349s 7s/step - loss: 27.9431 - val_loss: 26.9670
+Epoch 15/20
+51/51 [==============================] - 340s 7s/step - loss: 26.5757 - val_loss: 25.9211
+Epoch 16/20
+51/51 [==============================] - 333s 7s/step - loss: 25.7223 - val_loss: 25.2099
+Epoch 17/20
+51/51 [==============================] - 341s 7s/step - loss: 24.8986 - val_loss: 24.3275
+Epoch 18/20
+51/51 [==============================] - 338s 7s/step - loss: 24.2290 - val_loss: 23.7939
+Epoch 19/20
+51/51 [==============================] - 350s 7s/step - loss: 23.5470 - val_loss: 23.3142
+Epoch 20/20
+51/51 [==============================] - 338s 7s/step - loss: 22.9812 - val_loss: 22.7898
+Unfreeze all of the layers.
+Train on 1662 samples, val on 418 samples, with batch size 16.
+Epoch 21/35
+2019-01-01 22:29:25.354960: W tensorflow/core/common_runtime/bfc_allocator.cc:211] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.22GiB. The caller indicates that this is not a failure, but may mean that there could be performance gains if more memory were available.
+103/103 [==============================] - 454s 4s/step - loss: 15.2312 - val_loss: 14.2014
+Epoch 22/35
+103/103 [==============================] - 409s 4s/step - loss: 13.5243 - val_loss: 13.4935
+Epoch 23/35
+103/103 [==============================] - 414s 4s/step - loss: 13.1067 - val_loss: 13.2830
+Epoch 24/35
+103/103 [==============================] - 411s 4s/step - loss: 12.7463 - val_loss: 12.9980
+Epoch 25/35
+103/103 [==============================] - 412s 4s/step - loss: 12.7707 - val_loss: 12.8219
+Epoch 26/35
+103/103 [==============================] - 414s 4s/step - loss: 12.4236 - val_loss: 12.4875
+Epoch 27/35
+103/103 [==============================] - 409s 4s/step - loss: 12.3031 - val_loss: 12.3869
+Epoch 28/35
+103/103 [==============================] - 411s 4s/step - loss: 12.1008 - val_loss: 12.0538
+Epoch 29/35
+103/103 [==============================] - 411s 4s/step - loss: 11.9819 - val_loss: 12.3100
+Epoch 30/35
+103/103 [==============================] - 412s 4s/step - loss: 11.8218 - val_loss: 12.1255
+Epoch 31/35
+103/103 [==============================] - 412s 4s/step - loss: 11.7570 - val_loss: 11.9286
+Epoch 32/35
+103/103 [==============================] - 411s 4s/step - loss: 11.5840 - val_loss: 11.9419
+Epoch 33/35
+103/103 [==============================] - 409s 4s/step - loss: 11.5025 - val_loss: 11.8331
+Epoch 34/35
+103/103 [==============================] - 410s 4s/step - loss: 11.4433 - val_loss: 11.8888
+Epoch 35/35
+103/103 [==============================] - 407s 4s/step - loss: 11.3065 - val_loss: 11.5072
