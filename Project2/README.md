@@ -16,7 +16,7 @@ pip install -r requirements.txt
 Run project.py -tc with the training images on /data/train and validation images on /data/validation. Each of these folders must contain a folder with the images for each landmark
 
 ## Predict Image
-
+Run project.py -c filename where filename is the image to classify inside the /data/images/folder. The output is an array with the confidence for each class and the predicted class by the model as well as the confidence in this prediction.
 
 ## Statistics
 Run project.py -s and it will print the statistics of the images on /data/validation (with the ground truth annotations in /data_annotations/validation)
