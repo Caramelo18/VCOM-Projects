@@ -27,7 +27,7 @@ seed(1143)
 set_random_seed(1143)
 
 image_size = 299
-min_confidence = 0.35
+min_confidence = 0.6
 
 train_datagen = ImageDataGenerator(
         rescale=1./255,
